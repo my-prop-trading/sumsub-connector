@@ -1,1 +1,1 @@
-# sumsub-connector
+lib for sumsub rest api
