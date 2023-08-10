@@ -15,7 +15,7 @@ async fn create_access_tokens(client: &SumsubRestClient) {
     let client_id = Uuid::new_v4();
     let default_level = levels::DEFAULT_LEVEL_NAME;
     let access_tokens = client
-        .create_access_tokens(client_id.to_string(), default_level, None)
+        .create_access_token(client_id.to_string(), default_level, None)
         .await;
 
     println!("create_access_tokens result: {access_tokens:?}");

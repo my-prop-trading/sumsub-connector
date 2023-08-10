@@ -33,7 +33,7 @@ impl SumsubRestClient {
         }
     }
 
-    pub async fn create_access_tokens(
+    pub async fn create_access_token(
         &self,
         client_id: impl Into<String>,
         level_name: impl Into<String>,
