@@ -52,6 +52,25 @@ impl SumsubRestClient {
         Ok(resp)
     }
 
+    pub async fn create_applicant(
+        &self,
+        client_id: impl Into<String>,
+        level_name: impl Into<String>,
+        external_action_id: Option<String>,
+    ) -> Result<CreateAccessTokenResponse, Error> {
+        let query_params = CreateAccessTokenRequest {
+            client_id: client_id.into(),
+            level_name: level_name.into(),
+            external_action_id,
+        };
+
+        let resp: CreateAccessTokenResponse = self
+            .post_signed(SumsubEndpoint::AccessToken, query_params)
+            .await?;
+
+        Ok(resp)
+    }
+
     pub async fn post_signed<T: DeserializeOwned>(
         &self,
         endpoint: SumsubEndpoint,
