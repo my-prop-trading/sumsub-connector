@@ -42,7 +42,7 @@ pub struct WebhookPayload {
     pub type_: String,
 
     #[serde(rename = "reviewResult")]
-    pub review_result: WebhookPayloadReviewModel,
+    pub review_result: Option<WebhookPayloadReviewModel>,
 
     #[serde(rename = "reviewStatus")]
     pub review_status: String,
