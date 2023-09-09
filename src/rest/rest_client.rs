@@ -11,6 +11,8 @@ use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use std::time::SystemTime;
 
+use super::models::{GetApplicantIdRequest, GetApplicantIdResponse};
+
 #[derive(Clone)]
 pub struct SumsubRestClient {
     signer: RequestSigner,
@@ -45,8 +47,26 @@ impl SumsubRestClient {
             external_action_id,
         };
 
+        let query_params_string = serde_qs::to_string(&query_params).unwrap();
+        let query_params_string = format!("?{}", query_params_string);
         let resp: CreateAccessTokenResponse = self
-            .post_signed(SumsubEndpoint::AccessToken, query_params)
+            .post_signed(SumsubEndpoint::AccessToken, &query_params_string)
+            .await?;
+
+        Ok(resp)
+    }
+
+    pub async fn get_applicant_data(
+        &self,
+        applicant_id: impl Into<String>,
+    ) -> Result<GetApplicantIdResponse, Error> {
+        let query_params = GetApplicantIdRequest {
+            applicant_id: applicant_id.into(),
+        };
+        //let query_params_string = serde_qs::to_string(&query_params).unwrap();
+        let query_params_string = format!("/{}/one", query_params.applicant_id.clone());
+        let resp: GetApplicantIdResponse = self
+            .get_signed(SumsubEndpoint::ApplicantData, &query_params_string)
             .await?;
 
         Ok(resp)
@@ -63,9 +83,10 @@ impl SumsubRestClient {
             level_name: level_name.into(),
             external_action_id,
         };
-
+        let query_params_string = serde_qs::to_string(&query_params).unwrap();
+        let query_params_string = format!("?{}", query_params_string);
         let resp: CreateAccessTokenResponse = self
-            .post_signed(SumsubEndpoint::AccessToken, query_params)
+            .post_signed(SumsubEndpoint::AccessToken, &query_params_string)
             .await?;
 
         Ok(resp)
@@ -74,21 +95,21 @@ impl SumsubRestClient {
     pub async fn post_signed<T: DeserializeOwned>(
         &self,
         endpoint: SumsubEndpoint,
-        query_params: CreateAccessTokenRequest,
+        query_params_string: &str,
     ) -> Result<T, Error> {
         let ts = self.get_request_time();
-        let query_params_string = serde_qs::to_string(&query_params).unwrap();
+        //let query_params_string = serde_qs::to_string(&query_params).unwrap();
         let sign = self.signer.generate_sign(
             http::Method::POST.as_str(),
             endpoint.clone(),
             &ts.clone(),
-            &query_params_string.clone(),
+            query_params_string.clone(),
         );
         let url_with_query: String = format!(
-            "{}{}?{}",
+            "{}{}{}",
             self.host,
             String::from(endpoint),
-            query_params_string
+            query_params_string.clone()
         );
 
         let headers = self.build_headers(&ts.clone(), Some(&sign));
@@ -102,20 +123,43 @@ impl SumsubRestClient {
 
         //println!("{:?}", response);
 
-        self.handler(response, Some(query_params_string.clone()))
+        self.handler(response, Some(query_params_string.clone().to_owned()))
             .await
     }
 
-    // pub async fn get<T: DeserializeOwned>(&self, endpoint: SumsubEndpoint) -> Result<T, Error> {
-    //     let url: String = format!("{}{}", self.host, String::from(endpoint));
-    //     println!("{}", url);
+    pub async fn get_signed<T: DeserializeOwned>(
+        &self,
+        endpoint: SumsubEndpoint,
+        query_params_string: &str,
+    ) -> Result<T, Error> {
+        let ts = self.get_request_time();
+        //let query_params_string = serde_qs::to_string(&query_params).unwrap();
+        let sign = self.signer.generate_sign(
+            http::Method::GET.as_str(),
+            endpoint.clone(),
+            &ts.clone(),
+            query_params_string.clone(),
+        );
+        let url_with_query: String = format!(
+            "{}{}{}",
+            self.host,
+            String::from(endpoint),
+            query_params_string.clone()
+        );
 
-    //     let client = &self.inner_client;
-    //     let headers = self.build_headers(&self.get_request_time(), None);
-    //     let response = client.get(url.as_str()).headers(headers).send().await?;
+        let headers = self.build_headers(&ts.clone(), Some(&sign));
+        let client = &self.inner_client;
+        let response = client
+            .get(&url_with_query)
+            .headers(headers)
+            .send()
+            .await?;
 
-    //     self.handler(response, None).await
-    // }
+        println!("{:?}", response);
+
+        self.handler(response, Some(query_params_string.clone().to_owned()))
+            .await
+    }
 
     fn get_request_time(&self) -> String {
         let ts = SystemTime::now()

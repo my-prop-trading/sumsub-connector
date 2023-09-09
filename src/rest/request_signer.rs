@@ -24,7 +24,7 @@ impl RequestSigner {
     ) -> String {
         let mut signed_key = Hmac::<Sha256>::new_from_slice(self.secret_key.as_bytes()).unwrap();
         let string_to_sign: String = format!(
-            "{}{}{}?{}",
+            "{}{}{}{}",
             ts,
             http_method,
             String::from(endpoint),

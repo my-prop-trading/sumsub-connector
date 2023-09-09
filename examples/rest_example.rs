@@ -9,14 +9,23 @@ async fn main() {
     let app_token = std::env::var("APP_TOKEN").unwrap();
     let client = SumsubRestClient::new_with_config(secret_key, app_token, SumsubConfig::test_env());
     create_access_tokens(&client).await;
+    get_applicant_data(&client, "64fb3ea46911e17c9dd2eb93").await;
 }
 
 async fn create_access_tokens(client: &SumsubRestClient) {
     let client_id = Uuid::new_v4();
-    let default_level = levels::DEFAULT_LEVEL_NAME;
+    let default_level = levels::POI_LEVEL_NAME;
     let access_tokens = client
         .create_access_token(client_id.to_string(), default_level, None)
         .await;
 
     println!("create_access_tokens result: {access_tokens:?}");
+}
+
+async fn get_applicant_data(client: &SumsubRestClient, applicant_id: &str) {
+    let applicant_data = client
+        .get_applicant_data(applicant_id.to_string())
+        .await;
+
+    println!("get_applicant_data result: {applicant_data:?}");
 }

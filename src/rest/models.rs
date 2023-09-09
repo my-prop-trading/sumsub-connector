@@ -135,3 +135,29 @@ pub enum ApplicantType {
     #[serde(rename = "individual")]
     Individual = 1,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetApplicantIdRequest {
+    #[serde(rename = "applicantId")]
+    pub applicant_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetApplicantIdResponse {
+    #[serde(rename = "id")]
+    pub applicant_id: String,
+    #[serde(rename = "externalUserId")]
+    pub client_id: String,
+    #[serde(rename = "fixedInfo")]
+    pub fixed_info: Option<FixedInfoModel>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FixedInfoModel
+{
+    #[serde(rename ="firstName")]
+    pub first_name: String,
+
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+}
