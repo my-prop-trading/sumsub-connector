@@ -27,7 +27,7 @@ pub struct WebhookPayload {
     pub inspection_id: String,
 
     #[serde(rename = "applicantType")]
-    pub applicant_type: String,
+    pub applicant_type: ApplicantType,
 
     #[serde(rename = "correlationId")]
     pub correlation_id: String,
@@ -126,4 +126,12 @@ pub enum WebhookType {
     ApplicantTravelRuleStatusChanged = 13,
     #[serde(rename = "applicantWorkflowCompleted")]
     ApplicantWorkflowCompleted = 14,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ApplicantType {
+    #[serde(rename = "company")]
+    Company = 0,
+    #[serde(rename = "individual")]
+    Individual = 1,
 }
