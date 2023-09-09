@@ -39,13 +39,13 @@ pub struct WebhookPayload {
     pub sandbox_mode: bool,
 
     #[serde(rename = "type")]
-    pub type_: String,
+    pub webhookType: WebhookType,
 
     #[serde(rename = "reviewResult")]
     pub review_result: Option<WebhookPayloadReviewModel>,
 
     #[serde(rename = "reviewStatus")]
-    pub review_status: String,
+    pub review_status: ReviewStatus,
 
     #[serde(rename = "createdAt")]
     pub created_at: String,
@@ -76,4 +76,54 @@ pub struct WebhookPayloadReviewModel {
 
     #[serde(rename = "buttonIds")]
     pub button_ids: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ReviewStatus {
+    #[serde(rename = "init")]
+    Init = 0,
+    #[serde(rename = "pending")]
+    Pending = 1,
+    #[serde(rename = "prechecked")]
+    Prechecked = 2,
+    #[serde(rename = "queued")]
+    Queued =3,
+    #[serde(rename = "completed")]
+    Completed = 4,
+    #[serde(rename = "onHold")]
+    OnHold = 5,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum WebhookType {
+    #[serde(rename = "applicantReviewed")]
+    ApplicantReviewed = 0,
+    #[serde(rename = "applicantPending")]
+    ApplicantPending = 1,
+    #[serde(rename = "applicantCreated")]
+    ApplicantCreated = 2,
+    #[serde(rename = "applicantOnHold")]
+    ApplicantOnHold = 3,
+    #[serde(rename = "applicantPersonalInfoChanged")]
+    ApplicantPersonalInfoChanged = 4,
+    #[serde(rename = "applicantPrechecked")]
+    ApplicantPrechecked = 5,
+    #[serde(rename = "applicantDeleted")]
+    ApplicantDeleted = 6,
+    #[serde(rename = "applicantLevelChanged")]
+    ApplicantLevelChanged = 7,
+    #[serde(rename = "videoIdentStatusChanged")]
+    VideoIdentStatusChanged = 8,
+    #[serde(rename = "applicantReset")]
+    ApplicantReset = 9,
+    #[serde(rename = "applicantActionPending")]
+    ApplicantActionPending = 10,
+    #[serde(rename = "applicantActionReviewed")]
+    ApplicantActionReviewed = 11,
+    #[serde(rename = "applicantActionOnHold")]
+    ApplicantActionOnHold = 12,
+    #[serde(rename = "applicantTravelRuleStatusChanged")]
+    ApplicantTravelRuleStatusChanged = 13,
+    #[serde(rename = "applicantWorkflowCompleted")]
+    ApplicantWorkflowCompleted = 14,
 }
