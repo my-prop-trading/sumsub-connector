@@ -63,12 +63,13 @@ impl SumsubRestClient {
         let query_params = GetApplicantIdRequest {
             applicant_id: applicant_id.into(),
         };
-        //let query_params_string = serde_qs::to_string(&query_params).unwrap();
         let query_params_string = format!("/{}/one", query_params.applicant_id.clone());
         let resp: GetApplicantIdResponse = self
             .get_signed(SumsubEndpoint::ApplicantData, &query_params_string)
             .await?;
-
+        
+        println!("{:?}", serde_json::to_string(&resp).unwrap());
+        
         Ok(resp)
     }
 
@@ -120,9 +121,6 @@ impl SumsubRestClient {
             //.query(&query_params.clone())
             .send()
             .await?;
-
-        //println!("{:?}", response);
-
         self.handler(response, Some(query_params_string.clone().to_owned()))
             .await
     }
@@ -133,7 +131,6 @@ impl SumsubRestClient {
         query_params_string: &str,
     ) -> Result<T, Error> {
         let ts = self.get_request_time();
-        //let query_params_string = serde_qs::to_string(&query_params).unwrap();
         let sign = self.signer.generate_sign(
             http::Method::GET.as_str(),
             endpoint.clone(),
@@ -155,10 +152,10 @@ impl SumsubRestClient {
             .send()
             .await?;
 
-        println!("{:?}", response);
+        let response = self.handler(response, Some(query_params_string.clone().to_owned()))
+            .await;
+        response
 
-        self.handler(response, Some(query_params_string.clone().to_owned()))
-            .await
     }
 
     fn get_request_time(&self) -> String {

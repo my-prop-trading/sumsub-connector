@@ -1,4 +1,6 @@
+use rust_extensions::date_time::DateTimeAsMicroseconds;
 use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Utc};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateAccessTokenRequest {
@@ -42,7 +44,7 @@ pub struct WebhookPayload {
     pub webhookType: WebhookType,
 
     #[serde(rename = "reviewResult")]
-    pub review_result: Option<WebhookPayloadReviewModel>,
+    pub review_result: Option<ReviewResultModel>,
 
     #[serde(rename = "reviewStatus")]
     pub review_status: ReviewStatus,
@@ -58,24 +60,24 @@ pub struct WebhookPayload {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct WebhookPayloadReviewModel {
-    #[serde(rename = "moderationComment")]
-    pub moderation_comment: String,
+pub struct ReviewResultModel {
+    #[serde(rename = "moderationComment", skip_serializing_if = "Option::is_none")]
+    pub moderation_comment: Option<String>,
 
-    #[serde(rename = "clientComment")]
-    pub client_comment: String,
+    #[serde(rename = "clientComment", skip_serializing_if = "Option::is_none")]
+    pub client_comment: Option<String>,
 
     #[serde(rename = "reviewAnswer")]
     pub review_answer: String,
 
-    #[serde(rename = "rejectLabels")]
-    pub reject_labels: Vec<String>,
+    #[serde(rename = "rejectLabels", skip_serializing_if = "Option::is_none")]
+    pub reject_labels: Option<Vec<String>>,
 
-    #[serde(rename = "reviewRejectType")]
-    pub review_reject_type: String,
+    #[serde(rename = "reviewRejectType", skip_serializing_if = "Option::is_none")]
+    pub review_reject_type: Option<String>,
 
-    #[serde(rename = "buttonIds")]
-    pub button_ids: Vec<String>,
+    #[serde(rename = "buttonIds", skip_serializing_if = "Option::is_none")]
+    pub button_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -146,18 +148,132 @@ pub struct GetApplicantIdRequest {
 pub struct GetApplicantIdResponse {
     #[serde(rename = "id")]
     pub applicant_id: String,
+    #[serde(rename = "inspectionId")]
+    pub inspection_id: String,
     #[serde(rename = "externalUserId")]
     pub client_id: String,
-    #[serde(rename = "fixedInfo")]
+    #[serde(rename = "sourceKey", skip_serializing_if = "Option::is_none")]
+    pub source_key: Option<String>,
+    #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(rename = "phone", skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    #[serde(rename = "lang", skip_serializing_if = "Option::is_none")]
+    pub lang: Option<String>,
+    #[serde(rename = "metadata", skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<Vec<MetadataModel>>,
+    #[serde(rename = "fixedInfo", skip_serializing_if = "Option::is_none")]
     pub fixed_info: Option<FixedInfoModel>,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "requiredIdDocs", skip_serializing_if = "Option::is_none")]
+    pub required_id_docs: Option<RequiredIdDocsModel>,
+    #[serde(rename = "review")]
+    pub review: Option<ReviewModel>,
+    #[serde(rename = "questionnaires", skip_serializing_if = "Option::is_none")]
+    pub questionnaires: Option<Vec<QuestionnairesModel>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct MetadataModel{
+    #[serde(rename = "key")]
+    pub key: String,
+    #[serde(rename = "value")]
+    pub value: String,    
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FixedInfoModel
 {
     #[serde(rename ="firstName")]
-    pub first_name: String,
-
+    pub first_name: Option<String>,
     #[serde(rename = "lastName")]
-    pub last_name: String,
+    pub last_name: Option<String>,
+    #[serde(rename = "middleName")]
+    pub middle_name: Option<String>,
+    #[serde(rename = "firstNameEn")]
+    pub first_name_en: Option<String>,
+    #[serde(rename = "lastNameEn")]
+    pub last_name_en: Option<String>,
+    #[serde(rename = "middleNameEn")]
+    pub middle_name_en: Option<String>,
+    #[serde(rename = "legalName")]
+    pub legal_name: Option<String>,
+    #[serde(rename = "gender")]
+    pub gender: Option<String>,
+    #[serde(rename = "dob")]
+    pub dob: Option<String>,
+    #[serde(rename = "placeOfBirth")]
+    pub place_of_birth: Option<String>,
+    #[serde(rename = "country")]
+    pub country_iso3: Option<String>,
+    #[serde(rename = "nationality")]
+    pub nationality_iso3: Option<String>,
+    #[serde(rename = "addresses")]
+    pub addresses: Option<Vec<AddressModel>>,
+    #[serde(rename = "idDocs")]
+    pub id_docs: Option<Vec<DocumentModel>>
+
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RequiredIdDocsModel{
+    #[serde(rename = "docSets")]
+    pub doc_sets: Option<Vec<IdDocSet>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct IdDocSet {
+    #[serde(rename = "idDocSetType")]
+    pub id_doc_set_type: String,
+    #[serde(rename = "types")]
+    pub types: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ReviewModel{
+    #[serde(rename = "elapsedSincePendingMs", skip_serializing_if = "Option::is_none")]
+    elapsed_since_pending_ms: Option<i64>,
+    #[serde(rename = "elapsedSinceQueuedMs", skip_serializing_if = "Option::is_none")]
+    elapsed_since_queued_ms: Option<i64>,
+    #[serde(rename = "reprocessing", skip_serializing_if = "Option::is_none")]
+    reprocessing: Option<bool>,
+    #[serde(rename = "levelName")]
+    pub level_name: String,
+    #[serde(rename = "createDate")]
+    create_date: String,
+    #[serde(rename = "reviewDate", skip_serializing_if = "Option::is_none")]
+    review_date: Option<String>,
+    #[serde(rename = "expireDate", skip_serializing_if = "Option::is_none")]
+    expire_date: Option<String>,
+    #[serde(rename = "reviewResult", skip_serializing_if = "Option::is_none")]
+    review_result: Option<ReviewResultModel>,
+    #[serde(rename = "reviewStatus")]
+    review_status: ReviewStatus,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct QuestionnairesModel{
+
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct AddressModel{
+    #[serde(rename = "country")]
+    pub country_iso3: Option<String>,
+    #[serde(rename = "postCode")]
+    pub post_code: Option<String>,
+    #[serde(rename = "town")]
+    pub town: Option<String>,
+    #[serde(rename = "street")]
+    pub street: Option<String>,
+    #[serde(rename = "subStreet")]
+    pub sub_street: Option<String>,
+    #[serde(rename = "state")]
+    pub state: Option<String>
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct DocumentModel{
+
 }
