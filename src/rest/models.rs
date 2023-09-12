@@ -277,3 +277,27 @@ pub struct AddressModel{
 pub struct DocumentModel{
 
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetApplicantStatusRequest {
+    #[serde(rename = "applicantId")]
+    pub applicant_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetApplicantStatusResponse {
+    #[serde(rename = "createDate")]
+    pub created_date: String,
+    #[serde(rename = "reviewDate", skip_serializing_if = "Option::is_none")]
+    pub review_date: Option<String>,
+    #[serde(rename = "startDate", skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
+    #[serde(rename = "reviewResult", skip_serializing_if = "Option::is_none")]
+    pub review: Option<ReviewResultModel>,
+    #[serde(rename = "reviewStatus")]
+    pub review_status: ReviewStatus,
+    #[serde(rename = "levelName", skip_serializing_if = "Option::is_none")]
+    pub level_name: Option<String>,
+    #[serde(rename = "attemptCnt", skip_serializing_if = "Option::is_none")]
+    pub attempt_cnt: Option<i64>,
+}

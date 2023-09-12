@@ -1,15 +1,13 @@
 #[derive(Clone)]
 pub enum SumsubEndpoint {
-    AccessToken,
-    ApplicantData,
+    AccessTokens,
+    Applicants,
 }
 
 impl From<SumsubEndpoint> for String {
     fn from(item: SumsubEndpoint) -> Self {
         String::from(match item {
-            SumsubEndpoint::AccessToken => "/resources/accessTokens",
-            SumsubEndpoint::ApplicantData => "/resources/applicants",
-            //SumsubEndpoint::ApplicantData => "/resources/applicants/{applicantId}/one",
-        })
+            SumsubEndpoint::AccessTokens => "/resources/accessTokens",
+            SumsubEndpoint::Applicants => "/resources/applicants",        })
     }
 }

@@ -10,6 +10,7 @@ async fn main() {
     let client = SumsubRestClient::new_with_config(secret_key, app_token, SumsubConfig::test_env());
     create_access_tokens(&client).await;
     get_applicant_data(&client, "64fb3ea46911e17c9dd2eb93").await;
+    get_applicant_status(&client, "64fb3ea46911e17c9dd2eb93").await;
 }
 
 async fn create_access_tokens(client: &SumsubRestClient) {
@@ -28,4 +29,13 @@ async fn get_applicant_data(client: &SumsubRestClient, applicant_id: &str) {
         .await;
 
     println!("get_applicant_data result: {applicant_data:?}");
+}
+
+
+async fn get_applicant_status(client: &SumsubRestClient, applicant_id: &str) {
+    let applicant_data = client
+        .get_applicant_status(applicant_id.to_string())
+        .await;
+
+    println!("get_applicant_status result: {applicant_data:?}");
 }

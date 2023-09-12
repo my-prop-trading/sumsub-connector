@@ -1,7 +1,7 @@
 use crate::rest::config::SumsubConfig;
 use crate::rest::endpoints::SumsubEndpoint;
 use crate::rest::errors::Error;
-use crate::rest::models::{CreateAccessTokenRequest, CreateAccessTokenResponse};
+use crate::rest::models::{CreateAccessTokenRequest, CreateAccessTokenResponse, GetApplicantStatusRequest};
 use crate::rest::request_signer::RequestSigner;
 use error_chain::bail;
 use http::header::CONTENT_TYPE;
@@ -11,7 +11,7 @@ use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use std::time::SystemTime;
 
-use super::models::{GetApplicantIdRequest, GetApplicantIdResponse};
+use super::models::{GetApplicantIdRequest, GetApplicantIdResponse, GetApplicantStatusResponse};
 
 #[derive(Clone)]
 pub struct SumsubRestClient {
@@ -50,7 +50,7 @@ impl SumsubRestClient {
         let query_params_string = serde_qs::to_string(&query_params).unwrap();
         let query_params_string = format!("?{}", query_params_string);
         let resp: CreateAccessTokenResponse = self
-            .post_signed(SumsubEndpoint::AccessToken, &query_params_string)
+            .post_signed(SumsubEndpoint::AccessTokens, &query_params_string)
             .await?;
 
         Ok(resp)
@@ -65,7 +65,24 @@ impl SumsubRestClient {
         };
         let query_params_string = format!("/{}/one", query_params.applicant_id.clone());
         let resp: GetApplicantIdResponse = self
-            .get_signed(SumsubEndpoint::ApplicantData, &query_params_string)
+            .get_signed(SumsubEndpoint::Applicants, &query_params_string)
+            .await?;
+        
+        println!("{:?}", serde_json::to_string(&resp).unwrap());
+        
+        Ok(resp)
+    }
+
+    pub async fn get_applicant_status(
+        &self,
+        applicant_id: impl Into<String>,
+    ) -> Result<GetApplicantStatusResponse, Error> {
+        let query_params = GetApplicantStatusRequest {
+            applicant_id: applicant_id.into(),
+        };
+        let query_params_string = format!("/{}/status", query_params.applicant_id.clone());
+        let resp: GetApplicantStatusResponse = self
+            .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
         
         println!("{:?}", serde_json::to_string(&resp).unwrap());
@@ -87,7 +104,7 @@ impl SumsubRestClient {
         let query_params_string = serde_qs::to_string(&query_params).unwrap();
         let query_params_string = format!("?{}", query_params_string);
         let resp: CreateAccessTokenResponse = self
-            .post_signed(SumsubEndpoint::AccessToken, &query_params_string)
+            .post_signed(SumsubEndpoint::AccessTokens, &query_params_string)
             .await?;
 
         Ok(resp)
