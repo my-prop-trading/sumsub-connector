@@ -205,6 +205,10 @@ pub struct FixedInfoModel
     pub dob: Option<String>,
     #[serde(rename = "placeOfBirth")]
     pub place_of_birth: Option<String>,
+    #[serde(rename = "countryOfBirth")]
+    pub country_of_birth: Option<String>,
+    #[serde(rename = "stateOfBirth")]
+    pub state_of_birth: Option<String>,
     #[serde(rename = "country")]
     pub country_iso3: Option<String>,
     #[serde(rename = "nationality")]
@@ -212,7 +216,9 @@ pub struct FixedInfoModel
     #[serde(rename = "addresses")]
     pub addresses: Option<Vec<AddressModel>>,
     #[serde(rename = "idDocs")]
-    pub id_docs: Option<Vec<DocumentModel>>
+    pub id_docs: Option<Vec<DocumentModel>>,
+    #[serde(rename = "tin")]
+    pub tin: Option<String>
 
 }
 
@@ -228,6 +234,8 @@ pub struct IdDocSet {
     pub id_doc_set_type: String,
     #[serde(rename = "types")]
     pub types: Vec<String>,
+    #[serde(rename = "videoRequired", skip_serializing_if = "Option::is_none")]
+    pub video_required: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -270,12 +278,41 @@ pub struct AddressModel{
     #[serde(rename = "subStreet")]
     pub sub_street: Option<String>,
     #[serde(rename = "state")]
-    pub state: Option<String>
+    pub state: Option<String>,
+    #[serde(rename = "buildingName")]
+    pub building_name: Option<String>,
+    #[serde(rename = "flatNumber")]
+    pub flat_number: Option<String>,
+    #[serde(rename = "buildingNumber")]
+    pub building_number: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DocumentModel{
-
+    #[serde(rename = "idDocType")]
+    pub id_doc_type: String,
+    #[serde(rename = "country")]
+    pub country: String,
+    #[serde(rename = "firstName")]
+    pub first_name: String,
+    #[serde(rename = "firstNameEn")]
+    pub first_name_en: String,
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+    #[serde(rename = "lastNameEn")]
+    pub last_name_en: String,
+    #[serde(rename = "validUntil")]
+    pub valid_until: String,
+    #[serde(rename = "number")]
+    pub number: String,
+    #[serde(rename = "dob")]
+    pub dob: String,
+    #[serde(rename = "mrzLine1")]
+    pub mrz_line1: String,
+    #[serde(rename = "mrzLine2")]
+    pub mrz_line2: String,
+    #[serde(rename = "mrzLine3")]
+    pub mrz_line3: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
