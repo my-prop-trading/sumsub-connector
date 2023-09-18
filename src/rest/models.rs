@@ -1,6 +1,4 @@
-use rust_extensions::date_time::DateTimeAsMicroseconds;
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateAccessTokenRequest {
@@ -41,7 +39,7 @@ pub struct WebhookPayload {
     pub sandbox_mode: bool,
 
     #[serde(rename = "type")]
-    pub webhookType: WebhookType,
+    pub payload_type: WebhookType,
 
     #[serde(rename = "reviewResult")]
     pub review_result: Option<ReviewResultModel>,
@@ -338,3 +336,4 @@ pub struct GetApplicantStatusResponse {
     #[serde(rename = "attemptCnt", skip_serializing_if = "Option::is_none")]
     pub attempt_cnt: Option<i64>,
 }
+
