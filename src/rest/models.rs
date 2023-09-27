@@ -161,7 +161,9 @@ pub struct GetApplicantIdResponse {
     #[serde(rename = "metadata", skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<MetadataModel>>,
     #[serde(rename = "fixedInfo", skip_serializing_if = "Option::is_none")]
-    pub fixed_info: Option<FixedInfoModel>,
+    pub fixed_info: Option<InfoModel>,
+    #[serde(rename = "info", skip_serializing_if = "Option::is_none")]
+    pub info: Option<InfoModel>,
     #[serde(rename = "createdAt")]
     pub created_at: String,
     #[serde(rename = "requiredIdDocs", skip_serializing_if = "Option::is_none")]
@@ -181,7 +183,7 @@ pub struct MetadataModel{
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct FixedInfoModel
+pub struct InfoModel
 {
     #[serde(rename ="firstName")]
     pub first_name: Option<String>,
