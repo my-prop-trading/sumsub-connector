@@ -152,19 +152,19 @@ pub struct GetApplicantIdResponse {
     pub client_id: String,
     #[serde(rename = "sourceKey", skip_serializing_if = "Option::is_none")]
     pub source_key: Option<String>,
-    #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
+        #[serde(rename = "email", skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
-    #[serde(rename = "phone", skip_serializing_if = "Option::is_none")]
+#[serde(rename = "phone", skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
     #[serde(rename = "lang", skip_serializing_if = "Option::is_none")]
     pub lang: Option<String>,
-    #[serde(rename = "metadata", skip_serializing_if = "Option::is_none")]
+#[serde(rename = "metadata", skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<MetadataModel>>,
     #[serde(rename = "fixedInfo", skip_serializing_if = "Option::is_none")]
     pub fixed_info: Option<InfoModel>,
-    #[serde(rename = "info", skip_serializing_if = "Option::is_none")]
+        #[serde(rename = "info", skip_serializing_if = "Option::is_none")]
     pub info: Option<InfoModel>,
-    #[serde(rename = "createdAt")]
+        #[serde(rename = "createdAt")]
     pub created_at: String,
     #[serde(rename = "requiredIdDocs", skip_serializing_if = "Option::is_none")]
     pub required_id_docs: Option<RequiredIdDocsModel>,
@@ -172,7 +172,7 @@ pub struct GetApplicantIdResponse {
     pub review: Option<ReviewModel>,
     #[serde(rename = "questionnaires", skip_serializing_if = "Option::is_none")]
     pub questionnaires: Option<Vec<QuestionnairesModel>>,
-}
+    }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MetadataModel{
@@ -290,29 +290,29 @@ pub struct AddressModel{
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DocumentModel{
     #[serde(rename = "idDocType")]
-    pub id_doc_type: String,
+    pub id_doc_type: Option<String>,
     #[serde(rename = "country")]
-    pub country: String,
+    pub country: Option<String>,
     #[serde(rename = "firstName")]
-    pub first_name: String,
+    pub first_name: Option<String>,
     #[serde(rename = "firstNameEn")]
-    pub first_name_en: String,
+    pub first_name_en: Option<String>,
     #[serde(rename = "lastName")]
-    pub last_name: String,
+    pub last_name: Option<String>,
     #[serde(rename = "lastNameEn")]
-    pub last_name_en: String,
+    pub last_name_en: Option<String>,
     #[serde(rename = "validUntil")]
-    pub valid_until: String,
+    pub valid_until: Option<String>,
     #[serde(rename = "number")]
-    pub number: String,
+    pub number: Option<String>,
     #[serde(rename = "dob")]
-    pub dob: String,
-    #[serde(rename = "mrzLine1")]
-    pub mrz_line1: String,
-    #[serde(rename = "mrzLine2")]
-    pub mrz_line2: String,
-    #[serde(rename = "mrzLine3")]
-    pub mrz_line3: String,
+    pub dob: Option<String>,
+    #[serde(rename = "mrzLine1", skip_serializing_if = "Option::is_none")]
+    pub mrz_line1: Option<String>,
+    #[serde(rename = "mrzLine2", skip_serializing_if = "Option::is_none")]
+    pub mrz_line2: Option<String>,
+    #[serde(rename = "mrzLine3", skip_serializing_if = "Option::is_none")]
+    pub mrz_line3: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
