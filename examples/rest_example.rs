@@ -9,10 +9,10 @@ async fn main() {
     let app_token = std::env::var("APP_TOKEN").unwrap();
     let client = SumsubRestClient::new_with_config(secret_key, app_token, SumsubConfig::test_env());
     // create_access_tokens(&client).await;
-    // get_applicant_data(&client, "64fb3ea46911e17c9dd2eb93").await;
+    get_applicant_data(&client, "64fb3ea46911e17c9dd2eb93").await;
     // get_applicant_status(&client, "64fb3ea46911e17c9dd2eb93").await;
-    get_applicant_data(&client, "650169a3dea0060dd881165a").await;
-    get_applicant_status(&client, "650169a3dea0060dd881165a").await;
+    //get_applicant_data(&client, "653124533e2aed1c2c40a0a2").await;
+    //get_applicant_status(&client, "653124533e2aed1c2c40a0a2").await;
 }
 
 async fn create_access_tokens(client: &SumsubRestClient) {

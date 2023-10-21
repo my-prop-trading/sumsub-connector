@@ -7,17 +7,16 @@ use serde::Deserialize;
 // }
 
 #[derive(Default, Debug, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SumsubContentError {
-    //#[serde(rename = "description")]
+    #[serde(rename = "description")]
     pub description: String,
-    //#[serde(rename = "code")]
+    #[serde(rename = "code")]
     pub code: i64,
-    //#[serde(rename = "correlationId")]
+    #[serde(rename = "correlationId")]
     pub correlation_id: String,
-    //#[serde(rename = "errorCode")]
+    #[serde(rename = "errorCode")]
     pub error_code: i64,
-    //#[serde(rename = "errorName")]
+    #[serde(rename = "errorName")]
     pub error_name: String,
 }
 

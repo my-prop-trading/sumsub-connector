@@ -1,7 +1,9 @@
 use crate::rest::config::SumsubConfig;
 use crate::rest::endpoints::SumsubEndpoint;
 use crate::rest::errors::Error;
-use crate::rest::models::{CreateAccessTokenRequest, CreateAccessTokenResponse, GetApplicantStatusRequest};
+use crate::rest::models::{
+    CreateAccessTokenRequest, CreateAccessTokenResponse, GetApplicantStatusRequest,
+};
 use crate::rest::request_signer::RequestSigner;
 use error_chain::bail;
 use http::header::CONTENT_TYPE;
@@ -67,9 +69,9 @@ impl SumsubRestClient {
         let resp: GetApplicantIdResponse = self
             .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
-        
+
         println!("{:?}", serde_json::to_string(&resp).unwrap());
-        
+
         Ok(resp)
     }
 
@@ -84,9 +86,9 @@ impl SumsubRestClient {
         let resp: GetApplicantStatusResponse = self
             .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
-        
+
         println!("{:?}", serde_json::to_string(&resp).unwrap());
-        
+
         Ok(resp)
     }
 
@@ -169,10 +171,10 @@ impl SumsubRestClient {
             .send()
             .await?;
 
-        let response = self.handler(response, Some(query_params_string.clone().to_owned()))
+        let response = self
+            .handler(response, Some(query_params_string.clone().to_owned()))
             .await;
         response
-
     }
 
     fn get_request_time(&self) -> String {
@@ -218,7 +220,13 @@ impl SumsubRestClient {
         request_json: Option<String>,
     ) -> Result<T, Error> {
         match response.status() {
-            StatusCode::OK => Ok(response.json::<T>().await?),
+            StatusCode::OK => {
+                let json = response.json::<T>().await;
+                if let Err(err) = json {
+                    bail!("Failed to deserialize body {:?}", err);
+                }
+                Ok(json.unwrap())
+            },
             StatusCode::CREATED => {
                 let json: Result<String, _> = response.text().await;
                 let Ok(json) = json else {
