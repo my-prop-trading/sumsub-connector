@@ -290,7 +290,7 @@ pub struct AddressModel{
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DocumentModel{
     #[serde(rename = "idDocType")]
-    pub id_doc_type: Option<String>,
+    pub id_doc_type: String,
     #[serde(rename = "country")]
     pub country: Option<String>,
     #[serde(rename = "firstName")]
