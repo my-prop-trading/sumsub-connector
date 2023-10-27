@@ -1,9 +1,6 @@
 use crate::rest::config::SumsubConfig;
 use crate::rest::endpoints::SumsubEndpoint;
 use crate::rest::errors::Error;
-use crate::rest::models::{
-    CreateAccessTokenRequest, CreateAccessTokenResponse, GetApplicantStatusRequest,
-};
 use crate::rest::request_signer::RequestSigner;
 use error_chain::bail;
 use http::header::CONTENT_TYPE;
@@ -13,7 +10,11 @@ use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use std::time::SystemTime;
 
-use super::models::{GetApplicantIdRequest, GetApplicantIdResponse, GetApplicantStatusResponse};
+use super::models::{
+    GetApplicantIdRequest, GetApplicantIdResponse, 
+    CreateAccessTokenRequest, CreateAccessTokenResponse, 
+    GetApplicantStatusRequest, GetApplicantStatusResponse
+};
 
 #[derive(Clone)]
 pub struct SumsubRestClient {
