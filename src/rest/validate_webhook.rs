@@ -20,8 +20,21 @@ pub fn validate_webhook(
         }
     };
 
-    let x_signature_bytes = hex::decode(&x_signature).unwrap();
+    if x_signature.len() % 2 != 0 {
+        // Handle odd-length error
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "Unsupported signature",
+        )));
+    }
 
+    let Ok(x_signature_bytes) = hex::decode(&x_signature) else {
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "Unsupported signature",
+        )))
+    };
+    
     match algo.as_str() {
         "sha1" => {
             let mut body_signature = Hmac::<Sha1>::new_from_slice(secret_key.as_bytes())?;
