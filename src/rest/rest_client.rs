@@ -3,18 +3,13 @@ use crate::rest::endpoints::SumsubEndpoint;
 use crate::rest::errors::Error;
 use crate::rest::request_signer::RequestSigner;
 use error_chain::bail;
-use http::header::CONTENT_TYPE;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::Response;
 use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use std::time::SystemTime;
 
-use super::models::{
-    GetApplicantIdRequest, GetApplicantIdResponse, 
-    CreateAccessTokenRequest, CreateAccessTokenResponse, 
-    GetApplicantStatusRequest, GetApplicantStatusResponse
-};
+use super::models::*;
 
 #[derive(Clone)]
 pub struct SumsubRestClient {
@@ -93,6 +88,23 @@ impl SumsubRestClient {
         Ok(resp)
     }
 
+    pub async fn get_applicant_docs_status(
+        &self,
+        applicant_id: impl Into<String>,
+    ) -> Result<GetApplicantDocsStatusResponse, Error> {
+        let query_params = GetApplicantDocsStatusRequest {
+            applicant_id: applicant_id.into(),
+        };
+        let query_params_string = format!("/{}/requiredIdDocsStatus", query_params.applicant_id.clone());
+        let resp: GetApplicantDocsStatusResponse = self
+            .get_signed(SumsubEndpoint::Applicants, &query_params_string)
+            .await?;
+
+        println!("{:?}", serde_json::to_string(&resp).unwrap());
+
+        Ok(resp)
+    }
+
     pub async fn create_applicant(
         &self,
         client_id: impl Into<String>,
@@ -124,13 +136,13 @@ impl SumsubRestClient {
             http::Method::POST.as_str(),
             endpoint.clone(),
             &ts.clone(),
-            query_params_string.clone(),
+            query_params_string,
         );
         let url_with_query: String = format!(
             "{}{}{}",
             self.host,
             String::from(endpoint),
-            query_params_string.clone()
+            query_params_string
         );
 
         let headers = self.build_headers(&ts.clone(), Some(&sign));
@@ -141,7 +153,7 @@ impl SumsubRestClient {
             //.query(&query_params.clone())
             .send()
             .await?;
-        self.handler(response, Some(query_params_string.clone().to_owned()))
+        self.handler(response, Some(query_params_string.to_owned()))
             .await
     }
 
@@ -155,13 +167,13 @@ impl SumsubRestClient {
             http::Method::GET.as_str(),
             endpoint.clone(),
             &ts.clone(),
-            query_params_string.clone(),
+            query_params_string,
         );
         let url_with_query: String = format!(
             "{}{}{}",
             self.host,
             String::from(endpoint),
-            query_params_string.clone()
+            query_params_string
         );
 
         let headers = self.build_headers(&ts.clone(), Some(&sign));
@@ -173,7 +185,7 @@ impl SumsubRestClient {
             .await?;
 
         let response = self
-            .handler(response, Some(query_params_string.clone().to_owned()))
+            .handler(response, Some(query_params_string.to_owned()))
             .await;
         response
     }
@@ -191,7 +203,7 @@ impl SumsubRestClient {
         let mut custom_headers = HeaderMap::new();
 
         custom_headers.insert(
-            CONTENT_TYPE,
+            HeaderName::from_static("content-type"),
             HeaderValue::from_str("application/json").unwrap(),
         );
 

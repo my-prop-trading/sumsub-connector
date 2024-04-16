@@ -11,3 +11,6 @@ Cargo.lock
 **/bin
 **/obj
 **/node_modules
+
+.vscode/launch.json
+.debug

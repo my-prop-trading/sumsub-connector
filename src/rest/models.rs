@@ -339,3 +339,54 @@ pub struct GetApplicantStatusResponse {
     pub attempt_cnt: Option<i64>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetApplicantDocsStatusRequest {
+    #[serde(rename = "applicantId")]
+    pub applicant_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetApplicantDocsStatusResponse {
+    #[serde(rename = "IDENTITY")]
+    pub identity: Option<Identity>,
+
+    #[serde(rename = "SELFIE")]
+    pub selfie: Option<Selfie>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Identity {
+    #[serde(rename = "reviewResult")]
+    pub review_result: ReviewResultModel,
+
+    #[serde(rename = "country")]
+    pub country: String,
+
+    #[serde(rename = "idDocType")]
+    pub id_doc_type: String,
+
+    #[serde(rename = "imageIds")]
+    pub image_ids: Vec<i32>,
+
+    #[serde(rename = "imageReviewResults")]
+    pub image_review_results: std::collections::HashMap<i32, ReviewResultModel>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Selfie {
+    #[serde(rename = "reviewResult")]
+    pub review_result: ReviewResultModel,
+
+    #[serde(rename = "country")]
+    pub country: String,
+
+    #[serde(rename = "idDocType")]
+    pub id_doc_type: String,
+
+    #[serde(rename = "imageIds")]
+    pub image_ids: Vec<i32>,
+
+    #[serde(rename = "imageReviewResults")]
+    pub image_review_results: std::collections::HashMap<i32, ReviewResultModel>,
+}
+
