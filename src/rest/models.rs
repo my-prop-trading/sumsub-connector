@@ -65,8 +65,8 @@ pub struct ReviewResultModel {
     #[serde(rename = "clientComment", skip_serializing_if = "Option::is_none")]
     pub client_comment: Option<String>,
 
-    #[serde(rename = "reviewAnswer")]
-    pub review_answer: String,
+    #[serde(rename = "reviewAnswer", skip_serializing_if = "Option::is_none")]
+    pub review_answer: Option<String>,
 
     #[serde(rename = "rejectLabels", skip_serializing_if = "Option::is_none")]
     pub reject_labels: Option<Vec<String>>,
