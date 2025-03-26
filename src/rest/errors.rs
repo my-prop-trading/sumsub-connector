@@ -1,11 +1,6 @@
 use error_chain::error_chain;
 use serde::Deserialize;
 
-// #[derive(Debug, Deserialize)]
-// pub struct SumsubContentError {
-//     pub errors: HashMap<String, String>,
-// }
-
 #[derive(Default, Debug, PartialEq, Deserialize)]
 pub struct SumsubContentError {
     #[serde(rename = "description")]
@@ -27,10 +22,7 @@ error_chain! {
     types {
         Error, ErrorKind, ResultExt, Result;
     }
-
     foreign_links {
-        ReqError(reqwest::Error);
-        InvalidHeaderError(reqwest::header::InvalidHeaderValue);
         IoError(std::io::Error);
         ParseFloatError(std::num::ParseFloatError);
         UrlParserError(url::ParseError);

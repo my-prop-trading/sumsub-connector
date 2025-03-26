@@ -3,10 +3,10 @@ use crate::rest::endpoints::SumsubEndpoint;
 use crate::rest::errors::Error;
 use crate::rest::request_signer::RequestSigner;
 use error_chain::bail;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-use reqwest::Response;
-use reqwest::StatusCode;
+use flurl::{FlUrl, FlUrlResponse};
+use http::{HeaderMap, HeaderName, HeaderValue, StatusCode};
 use serde::de::DeserializeOwned;
+use serde_json::{Value, json};
 use std::time::SystemTime;
 
 use super::models::*;
@@ -16,7 +16,6 @@ pub struct SumsubRestClient {
     signer: RequestSigner,
     app_token: String,
     host: String,
-    inner_client: reqwest::Client,
 }
 
 impl SumsubRestClient {
@@ -28,8 +27,7 @@ impl SumsubRestClient {
         Self {
             signer: RequestSigner::new(secret_key),
             app_token,
-            host: config.rest_api_host,
-            inner_client: reqwest::Client::new(),
+            host: config.rest_api_host
         }
     }
 
@@ -146,15 +144,27 @@ impl SumsubRestClient {
         );
 
         let headers = self.build_headers(&ts.clone(), Some(&sign));
-        let client = &self.inner_client;
+        let mut client = FlUrl::new(url_with_query); // Make client mutable so we can modify it
+        
+        // Iterate over the headers and add them to the client
+        for (key, value) in headers.iter() {
+            let header_value = value.to_str().unwrap_or_default();
+            client = client.with_header(key.clone().to_string(), header_value); // Modify the client, no move
+        }
+        
+        let mut debug_info = "".to_string();
+        let empty_json: Value = json!({}); // Create an empty JSON object
+        
         let response = client
-            .post(&url_with_query)
-            .headers(headers)
-            //.query(&query_params.clone())
-            .send()
-            .await?;
-        self.handler(response, Some(query_params_string.to_owned()))
-            .await
+            .post_json_with_debug(&empty_json, &mut debug_info) // Use the same client here
+            .await;
+        match response {
+            Ok(res) => {
+                self.handler(res, Some(query_params_string.to_owned()))
+                .await
+            },
+            Err(err) => bail!("Failed to call post: {:?}", err),
+        }
     }
 
     pub async fn get_signed<T: DeserializeOwned>(
@@ -177,17 +187,25 @@ impl SumsubRestClient {
         );
 
         let headers = self.build_headers(&ts.clone(), Some(&sign));
-        let client = &self.inner_client;
-        let response = client
-            .get(&url_with_query)
-            .headers(headers)
-            .send()
-            .await?;
+        let mut client = FlUrl::new(url_with_query);
+        for (key, value) in headers.iter() {
+            let header_value = value.to_str().unwrap_or_default();
+            client = client.with_header(key.clone().to_string(), header_value);
+        }
 
-        let response = self
-            .handler(response, Some(query_params_string.to_owned()))
+        let response = client
+            .get()
             .await;
-        response
+        
+        match response {
+            Ok(res) => {
+                let response = self
+                    .handler(res, Some(query_params_string.to_owned()))
+                    .await;
+            response
+            },
+            Err(err) => bail!("Failed to call get: {:?}", err),
+        }
     }
 
     fn get_request_time(&self) -> String {
@@ -229,19 +247,30 @@ impl SumsubRestClient {
 
     async fn handler<T: DeserializeOwned>(
         &self,
-        response: Response,
+        mut response: FlUrlResponse,
         request_json: Option<String>,
     ) -> Result<T, Error> {
-        match response.status() {
+        // Get the status code from the response
+        let code = match StatusCode::from_u16(response.get_status_code()) {
+            Ok(cd) => cd,
+            Err(err) => bail!("Failed to read status result: {:?}", err),
+        };
+
+        match code {
             StatusCode::OK => {
-                let json = response.json::<T>().await;
-                if let Err(err) = json {
-                    bail!("Failed to deserialize body {:?}", err);
+                let json = response.get_json::<T>().await;
+                match json {
+                    Ok(data) => Ok(data),  // If successful, return the data
+                    Err(err) => bail!("Failed to deserialize body {:?}", err),  // If failure, handle error
                 }
-                Ok(json.unwrap())
             },
             StatusCode::CREATED => {
-                let json: Result<String, _> = response.text().await;
+                let body = match response.receive_body().await {
+                    Ok(res) => res.clone(),
+                    Err(err) => bail!("Failed to receive_body: {:?}", err),
+                };
+
+                let json: Result<String, _> = String::from_utf8(body);
                 let Ok(json) = json else {
                     bail!("Failed to read response body");
                 };
@@ -262,14 +291,22 @@ impl SumsubRestClient {
                 bail!("Unauthorized");
             }
             StatusCode::BAD_REQUEST => {
-                let error = response.text().await?;
+                let body = match response.receive_body().await {
+                    Ok(res) => res.clone(),
+                    Err(err) => bail!("Failed to receive_body: {:?}", err),
+                };
+                let error = String::from_utf8(body);
                 bail!(format!(
                     "Received bad request status. Request: {:?}. Response: {:?}",
                     request_json, error
                 ));
             }
             s => {
-                let error = response.text().await?;
+                let body = match response.receive_body().await {
+                    Ok(res) => res.clone(),
+                    Err(err) => bail!("Failed to receive_body: {:?}", err),
+                };
+                let error = String::from_utf8(body);
 
                 bail!(format!("Received response code: {s:?} error: {error:?}"));
             }
