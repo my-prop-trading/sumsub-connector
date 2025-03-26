@@ -18,7 +18,7 @@ futures = "*"
 futures-util = { version = "*", default-features = false }
 futures-core = { version = "*", default-features = false }
 futures-channel = "*"
-reqwest = { version = "*", features = ["json"] }
+flurl = { tag = "0.6.1", git = "https://github.com/MyJetTools/fl-url.git" }
 url = "*"
 error-chain = { version = "0.12.4", default-features = false }
 hmac = "*"
