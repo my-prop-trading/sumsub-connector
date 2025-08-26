@@ -6,9 +6,8 @@ use error_chain::bail;
 use flurl::{FlUrl, FlUrlResponse};
 use http::{HeaderMap, HeaderName, HeaderValue, StatusCode};
 use serde::de::DeserializeOwned;
-use serde_json::{Value, json};
 use std::time::SystemTime;
-
+use flurl::body::FlUrlBody;
 use super::models::*;
 
 #[derive(Clone)]
@@ -98,7 +97,7 @@ impl SumsubRestClient {
             .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
 
-        println!("{:?}", serde_json::to_string(&resp).unwrap());
+        println!("{:?}", serde_json::to_string(&resp));
 
         Ok(resp)
     }
@@ -151,12 +150,9 @@ impl SumsubRestClient {
             let header_value = value.to_str().unwrap_or_default();
             client = client.with_header(key.clone().to_string(), header_value); // Modify the client, no move
         }
-        
-        let mut debug_info = "".to_string();
-        let empty_json: Value = json!({}); // Create an empty JSON object
-        
+
         let response = client
-            .post_json_with_debug(&empty_json, &mut debug_info) // Use the same client here
+            .post(FlUrlBody::empty()) // Use the same client here
             .await;
         match response {
             Ok(res) => {
