@@ -35,11 +35,13 @@ impl SumsubRestClient {
         client_id: impl Into<String>,
         level_name: impl Into<String>,
         external_action_id: Option<String>,
+        ttl_in_secs: Option<i64>,
     ) -> Result<CreateAccessTokenResponse, Error> {
         let query_params = CreateAccessTokenRequest {
             client_id: client_id.into(),
             level_name: level_name.into(),
             external_action_id,
+            ttl_in_secs,
         };
 
         let query_params_string = serde_qs::to_string(&query_params).unwrap();
@@ -112,6 +114,7 @@ impl SumsubRestClient {
             client_id: client_id.into(),
             level_name: level_name.into(),
             external_action_id,
+            ttl_in_secs: None,
         };
         let query_params_string = serde_qs::to_string(&query_params).unwrap();
         let query_params_string = format!("?{}", query_params_string);

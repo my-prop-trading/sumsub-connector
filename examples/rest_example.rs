@@ -24,7 +24,7 @@ async fn create_poi_access_tokens(client: &SumsubRestClient, client_id: String) 
 
     let default_level = levels::POI_LEVEL_NAME;
     let access_tokens = client
-        .create_access_token(client_id, default_level, None)
+        .create_access_token(client_id, default_level, None, None)
         .await;
 
     println!("create_access_tokens result: {:?}", access_tokens);
@@ -33,7 +33,7 @@ async fn create_poi_access_tokens(client: &SumsubRestClient, client_id: String) 
 async fn create_poa_access_tokens(client: &SumsubRestClient, client_id: String) {
     let default_level = levels::POA_LEVEL_NAME;
     let access_tokens = client
-        .create_access_token(client_id, default_level, None)
+        .create_access_token(client_id, default_level, None, None)
         .await;
 
     println!("create_access_tokens result: {access_tokens:?}");

@@ -8,6 +8,10 @@ pub struct CreateAccessTokenRequest {
     pub level_name: String,
     #[serde(rename = "externalActionId")]
     pub external_action_id: Option<String>,
+    // Token lifespan in seconds. SumSub defaults to 600 (10 min) when omitted; skip
+    // serialization on None so callers can opt into the default.
+    #[serde(rename = "ttlInSecs", skip_serializing_if = "Option::is_none")]
+    pub ttl_in_secs: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
