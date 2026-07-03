@@ -6,7 +6,10 @@ pub struct CreateAccessTokenRequest {
     pub client_id: String,
     #[serde(rename = "levelName")]
     pub level_name: String,
-    #[serde(rename = "externalActionId")]
+    // Must skip on None: serde_qs 1.x serializes a None field as a bare `externalActionId`
+    // key (no `=value`), which SumSub's servlet rejects with 400 Bad Request. (serde_qs 0.x
+    // omitted None silently, so this only broke once the `*` dep drifted to 1.x.)
+    #[serde(rename = "externalActionId", skip_serializing_if = "Option::is_none")]
     pub external_action_id: Option<String>,
     // Token lifespan in seconds. SumSub defaults to 600 (10 min) when omitted; skip
     // serialization on None so callers can opt into the default.
