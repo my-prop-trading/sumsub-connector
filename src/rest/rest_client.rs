@@ -148,11 +148,12 @@ impl SumsubRestClient {
             client = client.with_header(key.clone().to_string(), header_value); // Modify the client, no move
         }
 
-        // Send an explicit "{}" JSON body, matching the pre-flurl connector (0.3.2). An empty
-        // body coincided with SumSub issuing an access token that failed websdkInit with a 409
-        // conflict (prod incident 2026-07), even though the accessTokens call itself succeeded.
+        // Send an explicit "{}" JSON body (an empty body with a JSON content-type reads as
+        // invalid JSON to SumSub's servlet). Pass content_type=None here: build_headers already
+        // set Content-Type, and flurl's header builder APPENDS rather than replaces — passing it
+        // again would send two Content-Type headers, which SumSub rejects with a 400.
         let response = client
-            .post(FlUrlBody::from_raw_data(b"{}".to_vec(), Some("application/json")))
+            .post(FlUrlBody::from_raw_data(b"{}".to_vec(), None))
             .await;
         match response {
             Ok(res) => {
