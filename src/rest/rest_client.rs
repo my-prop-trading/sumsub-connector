@@ -148,12 +148,13 @@ impl SumsubRestClient {
             client = client.with_header(key.clone().to_string(), header_value); // Modify the client, no move
         }
 
-        // Send an explicit "{}" JSON body (an empty body with a JSON content-type reads as
-        // invalid JSON to SumSub's servlet). Pass content_type=None here: build_headers already
-        // set Content-Type, and flurl's header builder APPENDS rather than replaces — passing it
-        // again would send two Content-Type headers, which SumSub rejects with a 400.
+        // Empty body — required for the signature to match. generate_sign() hashes only
+        // ts + method + path + query (no body), while SumSub verifies HMAC over
+        // ts + method + path + query + body. Any non-empty body (e.g. "{}") makes SumSub's
+        // hash differ from ours → 401 app-token-signature-mismatch. Params are in the query
+        // string, so no body is needed anyway.
         let response = client
-            .post(FlUrlBody::from_raw_data(b"{}".to_vec(), None))
+            .post(FlUrlBody::empty())
             .await;
         match response {
             Ok(res) => {
