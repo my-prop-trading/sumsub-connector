@@ -65,8 +65,6 @@ impl SumsubRestClient {
             .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
 
-        println!("{:?}", serde_json::to_string(&resp).unwrap());
-
         Ok(resp)
     }
 
@@ -82,8 +80,6 @@ impl SumsubRestClient {
             .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
 
-        println!("{:?}", serde_json::to_string(&resp).unwrap());
-
         Ok(resp)
     }
 
@@ -98,8 +94,6 @@ impl SumsubRestClient {
         let resp: GetApplicantDocsStatusResponse = self
             .get_signed(SumsubEndpoint::Applicants, &query_params_string)
             .await?;
-
-        println!("{:?}", serde_json::to_string(&resp));
 
         Ok(resp)
     }
@@ -281,13 +275,30 @@ impl SumsubRestClient {
                 Ok(body.unwrap())
             }
             StatusCode::INTERNAL_SERVER_ERROR => {
-                bail!("Internal Server Error");
+                let body = match response.receive_body().await {
+                    Ok(res) => res.clone(),
+                    Err(err) => bail!("Failed to receive_body: {:?}", err),
+                };
+                let error = String::from_utf8(body);
+                bail!(format!("Internal Server Error. Response: {:?}", error));
             }
             StatusCode::SERVICE_UNAVAILABLE => {
-                bail!("Service Unavailable");
+                let body = match response.receive_body().await {
+                    Ok(res) => res.clone(),
+                    Err(err) => bail!("Failed to receive_body: {:?}", err),
+                };
+                let error = String::from_utf8(body);
+                bail!(format!("Service Unavailable. Response: {:?}", error));
             }
             StatusCode::UNAUTHORIZED => {
-                bail!("Unauthorized");
+                // SumSub explains the auth failure in the body (bad signature, wrong app
+                // token, region mismatch, ...) — without it a 401 is undiagnosable.
+                let body = match response.receive_body().await {
+                    Ok(res) => res.clone(),
+                    Err(err) => bail!("Failed to receive_body: {:?}", err),
+                };
+                let error = String::from_utf8(body);
+                bail!(format!("Unauthorized. Response: {:?}", error));
             }
             StatusCode::BAD_REQUEST => {
                 let body = match response.receive_body().await {

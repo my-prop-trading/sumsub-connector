@@ -31,8 +31,6 @@ impl RequestSigner {
             query_params
         );
 
-        println!("{:?}", string_to_sign);
-
         signed_key.update(string_to_sign.as_bytes());
 
         hex::encode(signed_key.finalize().into_bytes())
