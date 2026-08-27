@@ -320,6 +320,11 @@ pub struct DocumentModel{
     pub mrz_line2: Option<String>,
     #[serde(rename = "mrzLine3", skip_serializing_if = "Option::is_none")]
     pub mrz_line3: Option<String>,
+    /// Address extracted from this document. Present on proof-of-address documents, where SumSub may
+    /// hold the address here and nowhere else — `info.addresses` / `fixedInfo.addresses` can be empty
+    /// while the document card carries it.
+    #[serde(rename = "address", skip_serializing_if = "Option::is_none")]
+    pub address: Option<AddressModel>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
