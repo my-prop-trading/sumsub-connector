@@ -357,6 +357,13 @@ pub struct GetApplicantDocsStatusRequest {
     pub applicant_id: String,
 }
 
+/// SumSub's acknowledgement body (`{"ok": 1}`). Optional so a bare `{}` still deserializes rather
+/// than turning a completed call into an error.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SumsubOkResponse {
+    pub ok: Option<i32>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GetApplicantDocsStatusResponse {
     #[serde(rename = "IDENTITY")]

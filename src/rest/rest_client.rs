@@ -2,6 +2,7 @@ use crate::rest::config::SumsubConfig;
 use crate::rest::endpoints::SumsubEndpoint;
 use crate::rest::errors::Error;
 use crate::rest::request_signer::RequestSigner;
+use crate::rest::steps::VerificationStep;
 use error_chain::bail;
 use flurl::{FlUrl, FlUrlResponse};
 use http::{HeaderMap, HeaderName, HeaderValue, StatusCode};
@@ -96,6 +97,22 @@ impl SumsubRestClient {
             .await?;
 
         Ok(resp)
+    }
+
+    /// Deactivates one verification step so the applicant can submit it again, leaving the other
+    /// steps and their approved documents alone. The full applicant reset deactivates *every*
+    /// uploaded document instead, which drops an already approved identity document.
+    ///
+    /// Needs the "Reset applicants" permission on the app token. Answers 409 when the applicant's
+    /// current level has no such step.
+    pub async fn reset_step(
+        &self,
+        applicant_id: impl Into<String>,
+        step: VerificationStep,
+    ) -> Result<SumsubOkResponse, Error> {
+        let path = format!("/{}/resetStep/{}", applicant_id.into(), step.as_str());
+
+        self.post_signed(SumsubEndpoint::Applicants, &path).await
     }
 
     pub async fn create_applicant(
