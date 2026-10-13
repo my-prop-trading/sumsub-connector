@@ -133,6 +133,11 @@ pub enum WebhookType {
     ApplicantTravelRuleStatusChanged = 13,
     #[serde(rename = "applicantWorkflowCompleted")]
     ApplicantWorkflowCompleted = 14,
+    #[serde(rename = "applicantStepsReset")]
+    ApplicantStepsReset = 15,
+    /// Any type added by SumSub after this enum; the payload is still well-formed.
+    #[serde(other)]
+    Unknown = 16,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
